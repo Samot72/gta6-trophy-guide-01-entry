@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Leonida Trophy Guide — all 55 GTA VI trophies (PS5), tracked offline</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="masthead">
+  <div class="masthead-text">
+    <h1>Leonida Trophy Guide</h1>
+    <p class="sub">Every one of the 55 PlayStation 5 trophies of Grand Theft Auto VI — official names, descriptions and grades, a cited guide to each, a roadmap to the Platinum, and the missables flagged. Works fully offline; your progress never leaves this browser.</p>
+  </div>
+  <div class="progress-box">
+    <div class="progress-numbers"><span id="earned-count">0</span> of 55 earned · <span id="earned-pct">0%</span></div>
+    <div class="progress-track"><div id="progress-bar"></div></div>
+    <div class="grade-counts" id="grade-counts"></div>
+  </div>
+</header>
+
+<nav class="view-tabs" aria-label="Views">
+  <button type="button" class="tab active" data-view="tracker">Trophy tracker</button>
+  <button type="button" class="tab" data-view="roadmap">Roadmap &amp; missables</button>
+</nav>
+
+<main>
+  <section id="view-tracker">
+    <div class="toolbar">
+      <input id="search" type="search" placeholder="Search trophies…" aria-label="Search trophies">
+      <div class="chips" id="filter-chips" role="group" aria-label="Filter trophies">
+        <button type="button" class="chip active" data-filter="all">All</button>
+        <button type="button" class="chip" data-filter="earned">Earned</button>
+        <button type="button" class="chip" data-filter="missing">Missing</button>
+        <button type="button" class="chip warn" data-filter="missable">Missable</button>
+        <button type="button" class="chip" data-filter="story">Story</button>
+        <button type="button" class="chip" data-filter="collectibles">Collectibles</button>
+        <button type="button" class="chip" data-filter="activities">Activities</button>
+        <button type="button" class="chip" data-filter="crime">Crime</button>
+        <button type="button" class="chip" data-filter="exploration">Exploration</button>
+        <button type="button" class="chip" data-filter="lifestyle">Lifestyle</button>
+        <button type="button" class="chip" data-filter="completion">Completion</button>
+      </div>
+      <label class="grade-pick">Grade
+        <select id="grade-filter">
+          <option value="all">All grades</option>
+          <option value="platinum">Platinum</option>
+          <option value="gold">Gold</option>
+          <option value="silver">Silver</option>
+          <option value="bronze">Bronze</option>
+        </select>
+      </label>
+      <label class="spoiler-toggle"><input type="checkbox" id="spoilers"> Hide story spoilers</label>
+      <div class="io-buttons">
+        <button type="button" id="export-btn">Export progress</button>
+        <label class="import-btn">Import progress <input type="file" id="import-file" accept="application/json"></label>
+        <button type="button" id="reset-btn">Reset</button>
+      </div>
+    </div>
+
+    <div class="tracker-grid">
+      <ol id="trophy-list" class="trophy-list"></ol>
+      <aside id="detail" class="detail" aria-live="polite">
+        <p class="detail-hint">Pick a trophy to read its guide: what to do, where and how, when it can be missed — and the sources each fact comes from.</p>
+      </aside>
+    </div>
+    <p id="no-results" class="no-results" hidden>No trophies match the current filter.</p>
+  </section>
+
+  <section id="view-roadmap" hidden>
+    <div class="roadmap-wrap">
+      <h2>Roadmap to the Platinum</h2>
+      <p class="roadmap-facts" id="roadmap-facts"></p>
+      <div id="roadmap-steps"></div>
+      <h2>Missable trophies</h2>
+      <div id="missable-list"></div>
+      <h2>Good to know</h2>
+      <ul class="fine-points">
+        <li><strong>One playthrough is enough.</strong> There are no difficulty settings and no mission replay; free roam continues after the story, and nothing on the 100% checklist is missable.</li>
+        <li><strong>Cheats lock trophies.</strong> GTA VI's cheats only unlock after the credits, and using one disables trophies and saving for that session — keep trophy runs cheat-free.</li>
+        <li><strong>No online trophies.</strong> All 55 are single-player, so the Platinum can never be lost to a server shutdown.</li>
+        <li><strong>Story trophies cannot be missed.</strong> All 17 unlock automatically as their chapters, missions and character strands are completed.</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <p id="provenance"></p>
+  <p>An unofficial fan guide. Not affiliated with Rockstar Games or Take-Two Interactive. Trophy names and descriptions are as published on PlayStation Network; every guide here is written for this page and cites its sources.</p>
+</footer>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>

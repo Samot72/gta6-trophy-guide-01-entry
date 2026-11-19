@@ -1,52 +1,72 @@
-// Entry program for the gta6-trophy-guide-01 bounty (Node 22, standard library only).
+// Leonida Legend — entry program for make.fun's gta6-trophy-guide-01 bounty.
 //
-// The guide itself is the static web app in app/ — plain files a desktop browser opens
-// at app/index.html and runs with the network off. This program is the delivery step:
-// it copies app/ and screenshots/ from beside this file into the output directory and
-// writes dossier.json there with the vendored make.fun library, which is the summary
-// the scorer checks and the judge reads. vendor/makefun-frontend.ts stays untouched:
-// the scorer requires the dossier to be byte for byte what its own copy writes.
+// What this program does, in order:
+//   1. Sanity-checks the guide's data file: the official list has exactly 55
+//      trophies and every one of them must carry a non-empty guide, because
+//      the sealed gate refuses the entry otherwise. Failing here, loudly and
+//      before anything is copied, beats failing on the server.
+//   2. Copies app/ and screenshots/ from beside this file into the output
+//      directory (/output in the grader; $MAKEFUN_OUTPUT_DIR elsewhere).
+//   3. Writes dossier.json into the output with the vendored library's
+//      buildDossier, under the gate's own caps, and reports its size.
 //
-// Run it the way the grader does, or locally with an output directory of your own:
-//   MAKEFUN_OUTPUT_DIR=out node main.ts
+// Node 22, standard library only. vendor/makefun-frontend.ts is the kit's
+// library and stays byte-identical to it: the scorer rebuilds the dossier
+// with its own copy and compares the two byte for byte.
 
-import { cpSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
-import { fileURLToPath } from "node:url";
-import { buildDossier } from "./vendor/makefun-frontend.ts";
+import { cpSync, existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { buildDossier } from './vendor/makefun-frontend.ts';
 
-const repoDir = fileURLToPath(new URL(".", import.meta.url));
-const outDir = process.env.MAKEFUN_OUTPUT_DIR ?? "/output";
+const EXPECTED_TROPHIES = 55;
+const DOSSIER_CAP_BYTES = 1.5 * 1024 * 1024;
 
-// The guide's data file must name every trophy before anything is handed in; a short
-// list would fail the scorer's trophies row anyway, so refuse early with a clear word.
-const data = JSON.parse(readFileSync(join(repoDir, "app", "data", "trophies.json"), "utf8"));
-if (!Array.isArray(data.trophies) || data.trophies.length !== 55) {
-  throw new Error(`app/data/trophies.json must hold the 55 official trophies, found ${data.trophies?.length}`);
+const repoDir = fileURLToPath(new URL('.', import.meta.url));
+const outDir = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';
+
+// --- step 1: the data check -------------------------------------------------
+
+const dataPath = join(repoDir, 'app', 'data', 'trophies.json');
+const data = JSON.parse(readFileSync(dataPath, 'utf8'));
+const list = Array.isArray(data) ? data : data.trophies;
+if (!Array.isArray(list) || list.length !== EXPECTED_TROPHIES) {
+  throw new Error(`trophies.json must list ${EXPECTED_TROPHIES} trophies, found ${Array.isArray(list) ? list.length : 'none'}`);
 }
-for (const trophy of data.trophies) {
-  if (typeof trophy.name !== "string" || trophy.name.trim() === "") {
-    throw new Error(`trophy #${trophy.id ?? "?"} has no name`);
-  }
-  if (typeof trophy.guide !== "string" || trophy.guide.trim() === "") {
-    throw new Error(`trophy "${trophy.name}" has no guide`);
-  }
+const guideless = list.filter((t) => typeof t?.name !== 'string' || typeof t?.guide !== 'string' || t.guide.trim() === '');
+if (guideless.length > 0) {
+  throw new Error(`trophies.json has ${guideless.length} trophies with no name or an empty guide`);
 }
+
+// --- step 2: copy the guide and its screenshots -----------------------------
 
 mkdirSync(outDir, { recursive: true });
-cpSync(join(repoDir, "app"), join(outDir, "app"), { recursive: true });
-if (existsSync(join(repoDir, "screenshots"))) {
-  cpSync(join(repoDir, "screenshots"), join(outDir, "screenshots"), { recursive: true });
+cpSync(join(repoDir, 'app'), join(outDir, 'app'), { recursive: true });
+mkdirSync(join(outDir, 'screenshots'), { recursive: true });
+if (existsSync(join(repoDir, 'screenshots'))) {
+  cpSync(join(repoDir, 'screenshots'), join(outDir, 'screenshots'), { recursive: true });
 }
 
-// The caps are the scorer's own (its gate reference): the dossier text is cut at
-// 160 KiB, screenshots are at most 4 files of 256 KiB, and app/ is at most 993
-// files and directories and 48 MiB. buildDossier refuses anything past them.
+// --- step 3: the dossier ------------------------------------------------------
+
 const dossier = buildDossier(outDir, {
   text_max_bytes: 163840,
   screenshots: { max: 4, max_bytes: 262144 },
   app_max_files: 993,
   app_max_bytes: 50331648,
 });
-writeFileSync(join(outDir, "dossier.json"), dossier);
-console.log(`handed in: app/ + screenshots/ + dossier.json (${dossier.length} bytes) -> ${outDir}`);
+const dossierPath = join(outDir, 'dossier.json');
+writeFileSync(dossierPath, dossier);
+
+const bytes = statSync(dossierPath).size;
+if (bytes > DOSSIER_CAP_BYTES) {
+  throw new Error(`dossier.json is ${bytes} bytes, over the 1.5 MiB cap`);
+}
+
+// Note on determinism: the grader runs this program twice, each time in a
+// fresh container with an empty /output, and requires both runs to write
+// the same bytes. buildDossier derives everything from app/ and
+// screenshots/ — no clocks, no randomness, no environment input — so two
+// fresh runs agree; the hand-in was verified that way before submitting.
+
+console.log(`handed in: ${list.length} trophies with guides, dossier.json ${bytes} bytes`);

@@ -3,93 +3,75 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Leonida Trophy Guide — all 55 GTA VI trophies (PS5), tracked offline</title>
+<title>Leonida Legend — GTA VI Trophy Guide &amp; Tracker</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header class="masthead">
-  <div class="masthead-text">
-    <h1>Leonida Trophy Guide</h1>
-    <p class="sub">Every one of the 55 PlayStation 5 trophies of Grand Theft Auto VI — official names, descriptions and grades, a cited guide to each, a roadmap to the Platinum, and the missables flagged. Works fully offline; your progress never leaves this browser.</p>
+<header id="topbar">
+  <div class="brand">
+    <h1>Leonida Legend</h1>
+    <p class="tagline">Grand Theft Auto VI · PS5 trophy guide &amp; tracker — all 55 trophies, every guide sourced. Works fully offline; progress never leaves this browser.</p>
   </div>
-  <div class="progress-box">
-    <div class="progress-numbers"><span id="earned-count">0</span> of 55 earned · <span id="earned-pct">0%</span></div>
-    <div class="progress-track"><div id="progress-bar"></div></div>
-    <div class="grade-counts" id="grade-counts"></div>
+  <div id="progress-panel">
+    <div id="progress-summary">0 of 55 earned</div>
+    <div id="progress-bar"><div id="progress-fill"></div></div>
+    <div id="grade-counts"></div>
   </div>
+  <nav id="actions">
+    <button id="view-checklist" class="action-btn is-active" type="button">Checklist</button>
+    <button id="view-roadmap" class="action-btn" type="button">Roadmap &amp; missables</button>
+    <button id="export-btn" class="action-btn" type="button">Export progress</button>
+    <label id="import-label" class="action-btn" for="import-file">Import progress</label>
+    <input id="import-file" type="file" accept="application/json,.json" hidden>
+    <label id="spoiler-toggle" title="Hide the names, descriptions and guides of story trophies until you earn them">
+      <input id="spoiler-checkbox" type="checkbox"> Spoiler shield (story)
+    </label>
+  </nav>
 </header>
 
-<nav class="view-tabs" aria-label="Views">
-  <button type="button" class="tab active" data-view="tracker">Trophy tracker</button>
-  <button type="button" class="tab" data-view="roadmap">Roadmap &amp; missables</button>
-</nav>
+<section id="filter-bar">
+  <input id="search-box" type="search" placeholder="Search trophies, missions, activities…" aria-label="Search trophies">
+  <div id="kind-filters" role="group" aria-label="Filter by kind"></div>
+  <select id="grade-filter" aria-label="Filter by grade">
+    <option value="all">All grades</option>
+    <option value="platinum">Platinum</option>
+    <option value="gold">Gold</option>
+    <option value="silver">Silver</option>
+    <option value="bronze">Bronze</option>
+  </select>
+  <select id="status-filter" aria-label="Filter by status">
+    <option value="all">All trophies</option>
+    <option value="earned">Earned</option>
+    <option value="missing">Missing</option>
+    <option value="missable">Missable only</option>
+  </select>
+</section>
 
-<main>
-  <section id="view-tracker">
-    <div class="toolbar">
-      <input id="search" type="search" placeholder="Search trophies…" aria-label="Search trophies">
-      <div class="chips" id="filter-chips" role="group" aria-label="Filter trophies">
-        <button type="button" class="chip active" data-filter="all">All</button>
-        <button type="button" class="chip" data-filter="earned">Earned</button>
-        <button type="button" class="chip" data-filter="missing">Missing</button>
-        <button type="button" class="chip warn" data-filter="missable">Missable</button>
-        <button type="button" class="chip" data-filter="story">Story</button>
-        <button type="button" class="chip" data-filter="collectibles">Collectibles</button>
-        <button type="button" class="chip" data-filter="activities">Activities</button>
-        <button type="button" class="chip" data-filter="crime">Crime</button>
-        <button type="button" class="chip" data-filter="exploration">Exploration</button>
-        <button type="button" class="chip" data-filter="lifestyle">Lifestyle</button>
-        <button type="button" class="chip" data-filter="completion">Completion</button>
-      </div>
-      <label class="grade-pick">Grade
-        <select id="grade-filter">
-          <option value="all">All grades</option>
-          <option value="platinum">Platinum</option>
-          <option value="gold">Gold</option>
-          <option value="silver">Silver</option>
-          <option value="bronze">Bronze</option>
-        </select>
-      </label>
-      <label class="spoiler-toggle"><input type="checkbox" id="spoilers"> Hide story spoilers</label>
-      <div class="io-buttons">
-        <button type="button" id="export-btn">Export progress</button>
-        <label class="import-btn">Import progress <input type="file" id="import-file" accept="application/json"></label>
-        <button type="button" id="reset-btn">Reset</button>
-      </div>
-    </div>
+<main id="checklist-view">
+  <ol id="trophy-list"></ol>
+  <article id="detail-panel">
+    <p class="detail-hint">Pick a trophy from the list to read its guide, sources and roadmap stage.</p>
+  </article>
+</main>
 
-    <div class="tracker-grid">
-      <ol id="trophy-list" class="trophy-list"></ol>
-      <aside id="detail" class="detail" aria-live="polite">
-        <p class="detail-hint">Pick a trophy to read its guide: what to do, where and how, when it can be missed — and the sources each fact comes from.</p>
-      </aside>
-    </div>
-    <p id="no-results" class="no-results" hidden>No trophies match the current filter.</p>
+<main id="roadmap-view" hidden>
+  <section id="roadmap-intro">
+    <h2>Roadmap to the platinum</h2>
+    <p>One playthrough is enough: about 200 hours by the launch guides' estimate, difficulty roughly 4/10, no online trophies and no difficulty setting to worry about. Cheats disable trophies and saving, so keep them off. There is no mission replay, but free-roam continues after the story and nothing on the 100% checklist is missable — keep a manual save at the start and end of each chapter anyway. Exactly one trophy is flagged potentially missable: <strong>Positive Mental Attitude</strong>, over a Chapter 1 meditation. The three steps below follow the shape of PowerPyx's launch roadmap (cited per trophy throughout this guide).</p>
   </section>
-
-  <section id="view-roadmap" hidden>
-    <div class="roadmap-wrap">
-      <h2>Roadmap to the Platinum</h2>
-      <p class="roadmap-facts" id="roadmap-facts"></p>
-      <div id="roadmap-steps"></div>
-      <h2>Missable trophies</h2>
-      <div id="missable-list"></div>
-      <h2>Good to know</h2>
-      <ul class="fine-points">
-        <li><strong>One playthrough is enough.</strong> There are no difficulty settings and no mission replay; free roam continues after the story, and nothing on the 100% checklist is missable.</li>
-        <li><strong>Cheats lock trophies.</strong> GTA VI's cheats only unlock after the credits, and using one disables trophies and saving for that session — keep trophy runs cheat-free.</li>
-        <li><strong>No online trophies.</strong> All 55 are single-player, so the Platinum can never be lost to a server shutdown.</li>
-        <li><strong>Story trophies cannot be missed.</strong> All 17 unlock automatically as their chapters, missions and character strands are completed.</li>
-      </ul>
-    </div>
+  <div id="roadmap-steps"></div>
+  <section id="missable-panel">
+    <h2>Missables &amp; unconfirmed</h2>
+    <div id="missable-list"></div>
   </section>
 </main>
 
-<footer>
-  <p id="provenance"></p>
-  <p>An unofficial fan guide. Not affiliated with Rockstar Games or Take-Two Interactive. Trophy names and descriptions are as published on PlayStation Network; every guide here is written for this page and cites its sources.</p>
+<footer id="colophon">
+  <p>Trophy names, descriptions and grades are the official PlayStation list (55 trophies: 1 platinum, 2 gold, 6 silver, 46 bronze; 28 hidden), as mirrored by Exophase and PSNProfiles. Guides are original to this entry and cite their sources per trophy. Not affiliated with Rockstar Games; no game artwork is used.</p>
 </footer>
 
-<script type="module" src="app.js"></script>
+<script src="tracker.js"></script>
+<script src="views.js"></script>
+<script src="app.js"></script>
 </body>
 </html>

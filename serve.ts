@@ -1,58 +1,39 @@
-// A small static file server for trying the guide locally (Node 22, standard library
-// only): `node serve.ts` serves app/ at http://localhost:8080, `--port <n>` picks
-// another port. It answers with the content types a browser needs, keeps every
-// request inside app/, and does nothing else — a development convenience, not a
-// public web server.
-import { createReadStream, statSync } from "node:fs";
-import { createServer } from "node:http";
-import { extname, join, normalize, resolve, sep } from "node:path";
-import { fileURLToPath } from "node:url";
+// serve.ts — a tiny static file server for trying the guide locally.
+// Serves this repository's app/ folder at http://localhost:8080 with the
+// handful of content types the guide uses. Node 22, standard library only.
+// It exists for development and screenshots; the entry itself is main.ts.
 
-const appRoot = resolve(fileURLToPath(new URL("./app", import.meta.url)));
-const portFlag = process.argv.indexOf("--port");
-const wanted = portFlag === -1 ? 8080 : Number(process.argv[portFlag + 1]);
-const port = Number.isInteger(wanted) && wanted > 0 && wanted < 65536 ? wanted : 8080;
+import { createServer } from 'node:http';
+import { readFile } from 'node:fs/promises';
+import { extname, join, normalize } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const root = join(fileURLToPath(new URL('.', import.meta.url)), 'app');
+const port = Number(process.env.PORT ?? 8080);
 
 const TYPES: Record<string, string> = {
-  ".html": "text/html; charset=utf-8",
-  ".js": "text/javascript; charset=utf-8",
-  ".css": "text/css; charset=utf-8",
-  ".json": "application/json; charset=utf-8",
-  ".png": "image/png",
-  ".jpg": "image/jpeg",
-  ".svg": "image/svg+xml",
-  ".ico": "image/x-icon",
+  '.html': 'text/html; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
+  '.js': 'text/javascript; charset=utf-8',
+  '.json': 'application/json; charset=utf-8',
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.svg': 'image/svg+xml',
 };
 
-createServer((req, res) => {
-  let path: string;
+createServer(async (req, res) => {
   try {
-    path = decodeURIComponent(new URL(req.url ?? "/", "http://localhost").pathname);
+    const url = new URL(req.url ?? '/', 'http://localhost');
+    const rel = normalize(decodeURIComponent(url.pathname)).replace(/^(\.\.[/\\])+/, '');
+    const file = join(root, rel === '/' ? 'index.html' : rel);
+    if (!file.startsWith(root)) throw new Error('outside root');
+    const body = await readFile(file);
+    res.writeHead(200, { 'content-type': TYPES[extname(file)] ?? 'application/octet-stream' });
+    res.end(body);
   } catch {
-    res.writeHead(400).end("bad request");
-    return;
+    res.writeHead(404, { 'content-type': 'text/plain' });
+    res.end('not found');
   }
-  if (path.endsWith("/")) path += "index.html";
-  const file = resolve(join(appRoot, normalize(path)));
-  if (file !== appRoot && !file.startsWith(appRoot + sep)) {
-    res.writeHead(403).end("forbidden");
-    return;
-  }
-  let size: number;
-  try {
-    const info = statSync(file);
-    if (!info.isFile()) throw new Error("not a file");
-    size = info.size;
-  } catch {
-    res.writeHead(404).end("not found");
-    return;
-  }
-  res.writeHead(200, {
-    "content-type": TYPES[extname(file).toLowerCase()] ?? "application/octet-stream",
-    "content-length": size,
-    "cache-control": "no-store",
-  });
-  createReadStream(file).pipe(res);
-}).listen(port, "127.0.0.1", () => {
-  console.log(`guide is being served at http://localhost:${port}`);
+}).listen(port, () => {
+  console.log(`guide at http://localhost:${port}`);
 });
